@@ -1,3 +1,4 @@
+import re
 import logging
 from datetime import datetime, UTC
 from enum import StrEnum
@@ -15,14 +16,6 @@ logger = logging.getLogger(__name__)
 
 CONTINUE_TO_TOOL = "continue_to_tool"
 CHAT_MODEL_NAME = "qwen3:0.6b"
-SYSTEM_PROMPT_CONTENT = (
-    "You are a helpful AI assistant. Your primary goal is to assist the user with their queries. "
-    "When responding, either provide a direct answer to the user or call a tool if necessary. "
-    "Do NOT include any of your internal thinking, reasoning, or self-correction narratives "
-    "(e.g., within <think></think> tags or similar constructs) "
-    "in your final response to the user, unless it's part of a structured tool call. "
-    "If you are not calling a tool, your response should be only the direct answer for the user."
-)
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
@@ -70,13 +63,13 @@ def agent_node(state: AgentState) -> dict[str, list[BaseMessage]]:
 
     """
     logger.info("---AGENT NODE---")
-    return {
-        "messages": [
-            llm.invoke(
-                input=[SystemMessage(content=SYSTEM_PROMPT_CONTENT)] + state["messages"]
-            )
-        ]
-    }
+
+    response = llm.invoke(input=state["messages"])
+    response.content = re.sub(
+        r"<think>.*?</think>", "", response.content, flags=re.DOTALL
+    )
+
+    return {"messages": [response]}
 
 
 def tool_node(state: AgentState) -> dict[str, list[ToolMessage]]:
