@@ -9,7 +9,11 @@ else
   echo "Ollama already installed."
 fi
 
-ollama pull qwen3:0.6b
+MODEL_NAME=${MODEL_NAME:-${1:-qwen3:0.6b}}
+
+export MODEL_NAME
+
+ollama pull "$MODEL_NAME"
 
 if [ ! -d ".venv" ]; then
   python3 -m venv .venv

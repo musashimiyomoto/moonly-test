@@ -1,3 +1,4 @@
+import os
 import re
 import logging
 from datetime import datetime, UTC
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 CONTINUE_TO_TOOL = "continue_to_tool"
-CHAT_MODEL_NAME = "qwen3:0.6b"
+CHAT_MODEL_NAME = os.getenv("MODEL_NAME")
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
@@ -43,6 +44,8 @@ def get_current_time() -> dict:
 
 
 tools = [get_current_time]
+
+
 
 llm = ChatOllama(model=CHAT_MODEL_NAME, temperature=0.0).bind_tools(tools=tools)
 
