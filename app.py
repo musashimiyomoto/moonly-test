@@ -4,7 +4,7 @@ from datetime import datetime, UTC
 from enum import StrEnum
 from typing import Annotated, TypedDict
 
-from langchain_core.messages import AIMessage, BaseMessage, ToolMessage, SystemMessage
+from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langchain_core.tools import tool
 from langchain_ollama import ChatOllama
 from langgraph.graph import END, StateGraph

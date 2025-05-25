@@ -21,6 +21,8 @@ The script will:
 - Install dependencies
 - Start the LangGraph dev server
 
+After the server starts, open: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
+
 ---
 
 For manual setup or troubleshooting, see the contents of `run.sh`.
