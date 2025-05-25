@@ -3,7 +3,7 @@ from datetime import datetime, UTC
 from enum import StrEnum
 from typing import Annotated, TypedDict
 
-from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
+from langchain_core.messages import AIMessage, BaseMessage, ToolMessage, SystemMessage
 from langchain_core.tools import tool
 from langchain_ollama import ChatOllama
 from langgraph.graph import END, StateGraph
@@ -15,6 +15,14 @@ logger = logging.getLogger(__name__)
 
 CONTINUE_TO_TOOL = "continue_to_tool"
 CHAT_MODEL_NAME = "qwen3:0.6b"
+SYSTEM_PROMPT_CONTENT = (
+    "You are a helpful AI assistant. Your primary goal is to assist the user with their queries. "
+    "When responding, either provide a direct answer to the user or call a tool if necessary. "
+    "Do NOT include any of your internal thinking, reasoning, or self-correction narratives "
+    "(e.g., within <think></think> tags or similar constructs) "
+    "in your final response to the user, unless it's part of a structured tool call. "
+    "If you are not calling a tool, your response should be only the direct answer for the user."
+)
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
@@ -30,7 +38,7 @@ class AgentState(TypedDict):
 @tool
 def get_current_time() -> dict:
     """Return the current UTC time in ISO-8601 format.
-    
+
     Returns:
         Current UTC time in ISO-8601 format.
 
@@ -62,7 +70,13 @@ def agent_node(state: AgentState) -> dict[str, list[BaseMessage]]:
 
     """
     logger.info("---AGENT NODE---")
-    return {"messages": [llm.invoke(input=state["messages"])]}
+    return {
+        "messages": [
+            llm.invoke(
+                input=[SystemMessage(content=SYSTEM_PROMPT_CONTENT)] + state["messages"]
+            )
+        ]
+    }
 
 
 def tool_node(state: AgentState) -> dict[str, list[ToolMessage]]:
@@ -93,9 +107,7 @@ def tool_node(state: AgentState) -> dict[str, list[ToolMessage]]:
         tool_name = tool_call["name"]
         logger.info(f"Calling tool: {tool_name} with args: {tool_call['args']}")
 
-        selected_tool = next(
-            (t for t in tools if t.name == tool_name), None
-        )
+        selected_tool = next((t for t in tools if t.name == tool_name), None)
 
         if selected_tool:
             try:
@@ -128,6 +140,7 @@ def tool_node(state: AgentState) -> dict[str, list[ToolMessage]]:
 
     return {"messages": tool_messages}
 
+
 def should_continue(state: AgentState) -> str:
     """Determines whether to continue with tool execution or end the process.
 
@@ -145,7 +158,11 @@ def should_continue(state: AgentState) -> str:
     """
     logger.info("---SHOULD CONTINUE---")
     last_message = state["messages"][-1]
-    return CONTINUE_TO_TOOL if isinstance(last_message, AIMessage) and last_message.tool_calls else END
+    return (
+        CONTINUE_TO_TOOL
+        if isinstance(last_message, AIMessage) and last_message.tool_calls
+        else END
+    )
 
 
 graph = StateGraph(state_schema=AgentState)
