@@ -11,34 +11,28 @@ This is a minimal stateless chatbot using [LangGraph](https://github.com/langcha
 
 Just run:
 ```bash
-bash run.sh
+bash run.sh [<model_name>]
 ```
 
 The script will:
 - Install Ollama if needed
-- Pull the required model (`qwen3:0.6b`)
+- Pull the specified model (default: `qwen3:0.6b`, or any other from the [Ollama library](https://ollama.com/library) if you provide its name)
 - Set up a Python virtual environment
 - Install dependencies
 - Start the LangGraph dev server
 
 After the server starts, open: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 
+**Examples:**
+- Default model:
+  ```bash
+  bash run.sh
+  ```
+- Custom model:
+  ```bash
+  bash run.sh llama3:8b
+  ```
+
 ---
 
 For manual setup or troubleshooting, see the contents of `run.sh`.
-
-## Using Other Ollama Models
-
-You can use any model from the [Ollama library](https://ollama.com/library) by specifying its name when running the script:
-
-```bash
-bash run.sh <model_name>
-```
-
-For example, to use the `llama3:8b` model, run:
-
-```bash
-bash run.sh llama3:8b
-```
-
-If no model name is provided, the default is `qwen3:0.6b`.
