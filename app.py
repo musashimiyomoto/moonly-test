@@ -66,7 +66,7 @@ def agent_node(state: AgentState) -> dict[str, list[BaseMessage]]:
 
     response = llm.invoke(input=state["messages"])
     response.content = re.sub(
-        r"<think>.*?</think>", "", response.content, flags=re.DOTALL
+        pattern=r"<think>.*?</think>", repl="", string=response.content, flags=re.DOTALL
     )
 
     return {"messages": [response]}
