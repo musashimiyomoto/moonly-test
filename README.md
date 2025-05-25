@@ -2,21 +2,25 @@
 
 This is a minimal stateless chatbot using [LangGraph](https://github.com/langchain-ai/langgraph) and a free local model via [Ollama](https://ollama.com/). It supports a single tool: `get_current_time`.
 
+## Requirements
+- Linux or WSL2
+- Python 3.8+
+- [Ollama](https://ollama.com/) (will be installed automatically if missing)
+
 ## Quickstart
 
-1. **Install Ollama** ([instructions](https://ollama.com/download))
-2. **Pull the smallest free model** (qwen3:0.6b):
-   ```bash
-   ollama pull qwen3:0.6b
-   ```
-3. **Clone and set up the repo:**
-   ```bash
-   python -m venv .venv && source .venv/bin/activate
-   pip install -r requirements.txt
-   langgraph dev
-   ```
-
-## One-liner for setup (Linux):
+Just run:
 ```bash
-curl -fsSL https://ollama.com/install.sh | sh && ollama pull phi3 && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && langgraph dev
+bash run.sh
 ```
+
+The script will:
+- Install Ollama if needed
+- Pull the required model (`qwen3:0.6b`)
+- Set up a Python virtual environment
+- Install dependencies
+- Start the LangGraph dev server
+
+---
+
+For manual setup or troubleshooting, see the contents of `run.sh`.
